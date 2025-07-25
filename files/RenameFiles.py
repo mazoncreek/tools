@@ -14,7 +14,7 @@ import time
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download CBOE Option Contracts")
+    parser = argparse.ArgumentParser(description="Rename Files")
     parser.add_argument("InputFileMask", action="store", help="Input File Name")
     parser.add_argument("OutputFileStub", action="store", help="Output File Name")
     parser.add_argument("--Verbose", action="store_true", default=False, help="Verbose Operation")
