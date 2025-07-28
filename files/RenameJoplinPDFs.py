@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-#   Rename files with a pattern
+#   Rename Joplin PDF files with a consistent number
 #
 
 # ==========================================================================
@@ -14,42 +14,58 @@ import os
 
 def main():
     parser = argparse.ArgumentParser(description="Rename Joplin PDF files")
-    parser.add_argument("InputFileMask", action="store", help="Input File Name")
-    parser.add_argument("OutputFileStub", action="store", help="Output File Name")
+    parser.add_argument("InputFiles", action="store", help="Input File Names")
+    parser.add_argument("--OutputDirectory", action="store", default=".", help="Output Directory")
     parser.add_argument("--Verbose", action="store_true", default=False, help="Verbose Operation")
-    parser.add_argument("--Write", action="store_true", default=False, help="Don't Write Output")
+    parser.add_argument("--Write", action="store_true", default=False, help="Write Output")
+    parser.add_argument("--Rename", action="store_true", default=False, help="Rename Files")
 
     args = parser.parse_args()
 
-    input_filename_mask = args.InputFileMask
-    output_filename_stub = args.OutputFileStub
+    input_filenames = args.InputFiles
+    output_directory = args.OutputDirectory
 
     verbose = args.Verbose
     write = args.Write
+    rename = args.Rename
+    command = "mv" if rename else "cp"
 
-    filename_list = sorted(glob.glob(input_filename_mask))
+    filename_list = sorted(glob.glob(input_filenames))
 
     for filename in filename_list:
         print(f"processing {filename}")
-        fields = filename.split("-")
+        processed_filename = cleanup_filename(filename)
+        fields = processed_filename.split("_")
+        print(fields)
+        continue
 
         if len(fields) == 1:
             if verbose:
                 print(f"Skipping {filename}")
             continue
 
-        output_filename = output_filename_stub
+        output_filename = output_directory
         for field in fields[1:]:
             output_filename = output_filename + "-" + field
 
         if verbose:
-            print(f"Copying to {output_filename}")
+            print(f"Ouput filename {output_filename}")
 
         if write:
-            os.system(f"cp \"{filename}\" \"{output_filename}\"")
+            os.system(f"{command} \"{filename}\" \"{output_filename}\"")
 
     return
 
+
+# ==========================================================================
+
+
+def cleanup_filename(filename):
+    processed_filename = filename.replace(" Species Spotlight - ", "")
+    # processed_filename = processed_filename.replace(" _", "_")
+    # processed_filename = processed_filename.replace("_ ", "_")
+    return processed_filename.split(".")[0]
+    
 
 # ==========================================================================
 
